@@ -1,9 +1,10 @@
 ---
 title: "Data Visualisation"
-author: ""
+author: "Munywanitsa Edgar"
 format:
   html:
     embed-resources: true
+    toc: true
 editor: visual
 execute:
   warning: false
@@ -46,10 +47,10 @@ library(rnaturalearth)
 7.  Render the document and fix any errors.
 
 ```{r}
-#| eval: false
+#| eval: true
  
-gapminder_2007 <- ___ |> 
-  ___(year == 2007) 
+gapminder_2007 <- gapminder |> 
+  filter(year == 2007) 
 ```
 
 ## Task 3: Summarize data for life expectancy by continent
@@ -73,13 +74,13 @@ gapminder_2007 <- ___ |>
 8.  Render the document and fix any errors.
 
 ```{r}
-#| eval: false
+#| eval: true
 
-gapminder_summary_2007 <- ___ |> 
-  group_by(___) |> 
+gapminder_summary_2007 <- gapminder |> 
+  group_by(continent) |> 
   summarise(
     count = n(),
-    lifeExp = median(___)
+    lifeExp = median(lifeExp)
   )
 ```
 
@@ -104,11 +105,11 @@ gapminder_summary_2007 <- ___ |>
 8.  Render the document and fix any errors.
 
 ```{r}
-#| eval: false
+#| eval: true
 
-gapminder_summary_continent_year <- gapminder ___ 
-  group_by(continent, ___) |> 
-  ___(lifeExp = median(lifeExp)) 
+gapminder_summary_continent_year <- gapminder |> 
+  group_by(continent, year) |> 
+  summarise(lifeExp = median(lifeExp)) 
 
 ```
 
@@ -141,9 +142,21 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 
 3.  Do not display (ignore) the outliers in the plot. **Note: Use a search engine or an AI tool to find the solution and add the link to the solution you have found.**
 
+    [https://www.r-bloggers.com/2020/01/how-to-remove-outliers-in-r/https://www.r-bloggers.com/2020/01/how-to-remove-outliers-in-r/](https://www.r-bloggers.com/2020/01/how-to-remove-outliers-in-r/)
+
 4.  Run the code contained in the code chunk and fix any errors.
 
 5.  What are the data types of the three variables used for aesthetic mappings?
+
+    ```{r}
+
+    ggplot(data = gapminder_2007,
+           mapping = aes(x = continent,
+                         y = lifeExp,
+                         fill = continent)) +
+      geom_boxplot(outlier.shape = NA)
+
+    ```
 
 ## Task 7: Create a timeseries plot
 
@@ -156,6 +169,16 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 -   continent to color using the `color = continent` argument inside `aes()`
 
 3.  Run the code contained in the code chunk and fix any errors.
+
+    ```{r}
+
+    ggplot(data = gapminder_summary_continent_year,
+           mapping = aes(x = year,
+                         y = lifeExp,
+                         color = continent)) +
+      geom_line() +
+      geom_point()
+    ```
 
 ## Task 8: Create a barplot
 
@@ -170,6 +193,14 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 
 3.  Run the code contained in the code chunk and fix any errors.
 
+    ```{r}
+
+    ggplot(data = gapminder_summary_2007,
+           mapping = aes(x = continent,
+                         y = count)) +
+      geom_col()
+    ```
+
 ### with `geom_bar()`
 
 1.  Add a new code chunk below.
@@ -180,7 +211,13 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 
 3.  Run the code contained in the code chunk and fix any errors.
 
-4.  The plot is identical to the plot created with `geom_col()`. Why? What does the `geom_bar()` function do? Write your text here:
+4.  The plot is identical to the plot created with `geom_col()`. Why? What does the `geom_bar()` function do? Write your text here: ***It makes the height of the bar proportional to the number of cases in each group***
+
+    ```{r}
+    ggplot(data = gapminder_2007,
+           mapping = aes(x = continent)) +
+      geom_bar()
+    ```
 
 ## Task 9: Create a histogram
 
@@ -202,7 +239,21 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 
 6.  Describe how the `geom_histogram()` function is similar to the `geom_bar()` function.
 
-7.  What happens by adding the 'breaks' argument? Play around with the numbers inside of `seq()` to see what changes. Describe here what you observe:
+7.  What happens by adding the 'breaks' argument? Play around with the numbers inside of `seq()` to see what changes. Describe here what you observe: ***I observed that the first number in the breaks argument is the starting value of the histogram, the second value if the ending value of the histogram and the third number represents the size of the bars in the histogram***
+
+    ```{r}
+    ggplot(data = gapminder_2007,
+           mapping = aes(x = lifeExp,
+                         fill = continent)) +
+      geom_histogram(col = "grey30")
+    ```
+
+```{r}
+ggplot(data = gapminder_2007,
+       mapping = aes(x = lifeExp,
+                     fill = continent)) +
+  geom_histogram(col = "grey30",breaks = seq(36, 100, 2.5))
+```
 
 ## Task 10: Scatterplot and faceting
 
@@ -220,6 +271,17 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 5.  Use the variable continent to facet the plot by adding: `facet_wrap(~continent)`.
 
 6.  Run the code contained in the code chunk and fix any errors.
+
+    ```{r}
+    ggplot(data = gapminder_2007,
+           mapping = aes(x = gdpPercap,
+                         y = lifeExp,
+                         size = pop,
+                         color = country)) +
+      geom_point(show.legend = FALSE) +
+      facet_wrap(~continent)
+      
+    ```
 
 ## Task 11: Create a lineplot and use facets
 
@@ -245,7 +307,7 @@ ggplot(data = gapminder,
                      color = country)) +
   geom_line(lwd = 1, show.legend = FALSE) + 
   facet_wrap(~continent) +
-  # scale_color_manual(values = country_colors) +
+  scale_color_manual(values = country_colors) +
   theme_minimal() 
 
 ```
@@ -263,7 +325,7 @@ The code chunk below contains code for a world map that shows countries by incom
 3.  Render the document and fix any errors.
 
 ```{r}
-#| eval: false
+#| eval: true
 
 world <- ne_countries(scale = "small", returnclass = "sf")
 
